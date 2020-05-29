@@ -34,4 +34,4 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 ### To-Do
 
-[x] Add Dark-Mode toggle button
+-[x] Add Dark-Mode toggle button
