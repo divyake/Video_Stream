@@ -3,79 +3,67 @@ import SearchBar from './components/searchBar';
 import VideoDetails from './components/videoDetails';
 import VideoList from './components/videoList';
 
-import {Grid} from '@material-ui/core';
+import {Grid, IconButton} from '@material-ui/core';
+import Brightness4TwoToneIcon from '@material-ui/icons/Brightness4TwoTone';
+import {ThemeProvider, createGlobalStyle} from 'styled-components'
+
 
 import youtube from './api/youtube';
 
+const GlobalStyle =createGlobalStyle `
+body{
+    background-color: ${props => props.theme.mode === 'dark' ? '#111' : '#FFF'};
+    color : ${props => props.theme.mode === 'dark' ? '#FFF' : '#111 '}
+}
+`
 
-
-class App extends React.Component{
-   
-    state = {
-        videos: [],
-        selectedVideos: null,
-        theme : ({mode:'dark'}),
-        
-    
-    };
-
-    componentDidMount (){
-        this.handleSubmit('learn reactjs')
-    }
-
-    onVideoSelect = (video) => {
-this.setState({selectedVideos  : video})
-    }
-
-    handleSubmit = async (searchTerm) => {
+const App = () => {
+    const [videos, setVideos] = useState([]);
+    const [selectedVideos, setSelectedVideos] = useState(null);
+    const [theme, setTheme] = useState( {mode: 'dark'});
+    const handleSubmit = async (searchTerm) => {
         const response = await youtube.get('search', { params: {
             part : 'snippet',
             maxResults : 5,
             key : 'AIzaSyCPch1B4Cmatt2hZ8xdp9eoiv02M6_gMEU',
             q : searchTerm,
         }
-    });
 
-    this.setState({ videos: response.data.items, selectedVideos: response.data.items[0] });
-  
-    };
+    })
+    setVideos(response.data.items);
+    setSelectedVideos(response.data.items[0]);};
 
-    onChangeTheme = (theme) => {
-
-        this.setState({theme: theme});
-    }
-
-    render () 
-    {
-        
-        const { selectedVideos,videos } = this.state;
-        return (
-            
-            <Grid justify="center" container spacing ={8}>
-              
-                <Grid item xs={12}>
-                
-                    <Grid container spacing={10}>
-                        <Grid item xs={12}>
-                           <SearchBar onFormSubmit={this.handleSubmit}/>
-                        </Grid>
-                        <Grid item xs={8}>
-                          <VideoDetails video={selectedVideos}/> 
-                        </Grid>
-                        <Grid item xs={4}>
-                            <VideoList videos={videos} onVideoSelect={this.onVideoSelect}/>
-                        </Grid>
-                    
-                    </Grid>
-                </Grid>
-               
+    
+    
+    return(
+    <Grid style={{justifyContent: 'center' }} container spacing ={10}>
+       <ThemeProvider theme={theme}>       
+    <Grid item xs={12}>
+    <GlobalStyle/>
+        <Grid container spacing={10}>
+            <Grid item xs={12}>
+               <SearchBar onFormSubmit={handleSubmit}/>
+               <IconButton onClick={e => setTheme(theme.mode === 'dark' ? {mode: 'light'}: {mode: 'dark'})} style={{marginTop:'20px'}}>
+                <Brightness4TwoToneIcon style={{fontSize:'40' , color:'#EEE'}}/>
+                </IconButton>
             </Grid>
-         
-            
+            <Grid item xs={8}>
+              <VideoDetails video={selectedVideos}/> 
+                
+            </Grid>
+            <Grid item xs={4}>
+                <VideoList videos={videos} onVideoSelect={setSelectedVideos}/>
+            </Grid>
+        
+        </Grid>
+    </Grid>
+    </ThemeProvider>
+</Grid>
+
+);
+  
+};
 
 
-        )
-    }
-}
 
 export default App;
